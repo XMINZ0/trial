@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confession</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8e9e9;
+            color: #333;
+            text-align: center;
+        }
+        .lock-screen, .confession-screen, .guess-screen, .nice-try-screen {
+            display: none;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 90%; /* Set width to be more responsive on mobile */
+            max-width: 400px; /* Maximum width for larger screens */
+        }
+        .lock-screen.active, .confession-screen.active, .guess-screen.active, .nice-try-screen.active {
+            display: block;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px); /* Full width for inputs */
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%; /* Full width for buttons */
+        }
+        .crash {
+            color: red;
+            font-size: 24px;
+        }
+        .heart {
+            display: none;
+            font-size: 60px;
+            color: pink;
+            animation: heartBeat 0.8s infinite;
+        }
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="lock-screen active" id="lockScreen">
+        <h1>What's your name?</h1>
+        <input type="text" id="firstName" placeholder="First Name" required>
+        <input type="text" id="lastName" placeholder="Last Name" required>
+        <button type="button" onclick="checkAnswer(event)">Submit</button>
+    </div>
+    
+    <div class="confession-screen" id="confessionScreen">
+        <div class="heart">❤️</div>
+        <h2>Heartfelt Confession</h2>
+        <p>In the quiet moments of my day, I find my thoughts drifting to you. There's something about your thoughts that ignites a spark in my heart. I’ve had a crush on you for quite some time, and the feelings I've tried to hide have grown stronger with each passing moment. Your imagination captivates me, and I can't ignore this connection any longer. Just know that someone out there holds a special admiration for you, even if it’s kept in the shadows.</p>
+        <button onclick="showGuessScreen()">Next</button>
+    </div>
+
+    <div class="guess-screen" id="guessScreen">
+        <h3>Who do you think sent it?</h3>
+        <input type="text" id="senderGuess" placeholder="Type your guess here">
+        <button onclick="checkSender()">Submit Guess</button>
+    </div>
+
+    <div class="nice-try-screen" id="niceTryScreen">
+        <h2>Nice try!</h2>
+    </div>
+    
+    <div class="crash" id="crashMessage" style="display:none;">
+        Not the right person.
+    </div>
+
+    <script>
+        // Checking the name input on the lock screen
+        function checkAnswer(e) {
+            if (e) {
+                e.preventDefault();
+            }
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const correctAnswer = "Marwa Mukhtar";
+
+            if (firstName && lastName) { // Ensure the inputs are filled
+                if ((firstName + " " + lastName) === correctAnswer) {
+                    document.getElementById('lockScreen').classList.remove('active');
+                    document.getElementById('confessionScreen').classList.add('active');
+                    document.querySelector('.heart').style.display = 'block'; // Show heart animation
+                } else {
+                    document.getElementById('lockScreen').style.display = 'none';
+                    document.getElementById('crashMessage').style.display = 'block';
+                    setTimeout(() => { location.reload(); }, 2000); // Refresh the page after 2 seconds
+                }
+            } else {
+                alert("Please enter both first and last names."); // Fallback alert for empty fields
+            }
+        }
+
+        // Move to the guess screen
+        function showGuessScreen() {
+            document.getElementById('confessionScreen').classList.remove('active');
+            document.getElementById('guessScreen').classList.add('active');
+        }
+
+        // Checking the sender guess on the guess screen
+        function checkSender() {
+            const guess = document.getElementById('senderGuess').value.trim();
+            const validOptions = ['Mohamed', 'Bashir', 'Minzo'];
+            
+            if (validOptions.includes(guess)) {
+                // Display message and provide WhatsApp link when the correct answer is submitted
+                document.getElementById('guessScreen').innerHTML = `
+                    <h2>There he is, waiting for an answer</h2>
+                    <a href="https://api.whatsapp.com/send/?phone=%2B254105050566&text&type=phone_number&app_absent=0" target="_blank">
+                        Click here to reply on WhatsApp
+                    </a>
+                `;
+            } else {
+                // Show "Nice try" page and crash out
+                document.getElementById('guessScreen').style.display = 'none';
+                document.getElementById('niceTryScreen').classList.add('active');
+                setTimeout(() => {
+                    location.reload(); // Refresh the page to "expire" the link
+                }, 2000); // Expire after 2 seconds
+            }
+        }
+    </script>
+</body>
+</html>
